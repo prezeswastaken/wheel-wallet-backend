@@ -1,5 +1,4 @@
 # How to run this?
-- `cd backend-wheel-wallet`
 - copy **.env.example** file to **.env** file and adjust it to your likink
 - now you need to install composer dependencies to this project with a **temporary docker container**. To do this, run
 ```
