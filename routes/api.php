@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\CarController;
 use App\Http\Controllers\Api\CarPhotoController;
 use App\Http\Controllers\Api\UserController;
@@ -39,6 +40,13 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::get('car/{id}', [CarController::class, 'show']);
     Route::put('car/{id}/edit', [CarController::class, 'edit']);
     Route::delete('car/{id}/delete', [CarController::class, 'delete']);
+
     Route::post('car/{id}/upload', [CarPhotoController::class, 'store']);
     Route::get('car/{id}/photos', [CarPhotoController::class, 'show']);
+
+    Route::post('expense', [ExpenseController::class, 'store']);
+    Route::put('expense/{id}/edit', [ExpenseController::class, 'edit']);
+    Route::delete('expense/{id}/delete', [ExpenseController::class, 'delete']);
+    Route::get('user/{id}/expenses', [ExpenseController::class, 'userexpenses']);
+    Route::get('car/{id}/expenses', [ExpenseController::class, 'carexpenses']);
 });
