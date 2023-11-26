@@ -34,6 +34,7 @@ Route::get('hello', function () {
 Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::get('user/{id}/cars', [CarController::class, 'read']);
     Route::post('car', [CarController::class, 'store']);
+    Route::post('car/join', [CarController::class, 'join']);
     Route::get('car', [CarController::class, 'index']);
     Route::get('car/{id}', [CarController::class, 'show']);
     Route::put('car/{id}/edit', [CarController::class, 'edit']);

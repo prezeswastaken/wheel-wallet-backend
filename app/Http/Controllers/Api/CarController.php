@@ -88,13 +88,20 @@ class CarController extends Controller
         $car = Car::find($id);
         
         if($car){
+            if(Auth::user()->cannot('read', $car)){
+                return response()->json([
+                    'status' => 403,
+                    'message' => 'You do not own this car'
+                ]);
+            }
+            else{
+                $data = [
+                    'status' => 200,
+                    'car' => $car
+                ];
 
-            $data = [
-                'status' => 200,
-                'car' => $car
-            ];
-
-            return response()->json($data, 200);
+                return response()->json($data, 200);
+            }
         }
         else{
 
@@ -212,5 +219,29 @@ class CarController extends Controller
 
             return response()->json($data, 404);
         }
+    }
+
+    public function join(Request $request){
+        $car = Car::where('code', $request->code)->first();
+        if($car){
+            $car->update([
+                'coowner_id' => Auth::user()->id
+            ]);
+
+            $data = [
+                'status' => 200,
+                'message' => 'Joined car as co-owner successfully'
+            ];
+            return response()->json($data, 200);
+        }
+        else{
+            $data = [
+                'status' => 404,
+                'message' => 'No car with such code found'
+            ];
+
+            return response()->json($data, 404);
+        }
+
     }
 }
