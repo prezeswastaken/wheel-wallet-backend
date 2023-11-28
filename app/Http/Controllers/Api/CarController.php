@@ -137,9 +137,10 @@ class CarController extends Controller
         return response()->json($cars);
     }
     public function edit(Request $request, $id){
+
         $validator = Validator::make($request->all(),[
             'model' => 'required|string|max:50',
-            'owner_id' => 'required',
+            'owner_id' => '',
             'coowner_id' => '',
             'status' => 'string|max:100'
         ]);
@@ -168,7 +169,7 @@ class CarController extends Controller
                 
                 $car->update([
                     'model' => $request->model,
-                    'owner_id' => $request->owner_id,
+                    'owner_id' => Auth::user()->id,
                     'coowner_id' => null,
                     'status' => $request->status,
                     'code' => strval($request->owner_id.substr(trim($request->model), 0, 3).time())
