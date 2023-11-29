@@ -5,17 +5,19 @@ namespace App\Http\Controllers\Api;
 use App\Models\Car;
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Models\CarPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 
 class CarController extends Controller
 {
-    public function index(){
+    public function index()
+    {
 
         $cars = Car::all();
 
-        if($cars->count() > 0){
+        if($cars->count() > 0) {
 
             $data = [
                 'status' => 200,
@@ -23,8 +25,7 @@ class CarController extends Controller
             ];
 
             return response()->json($data, 200);
-        }
-        else{
+        } else {
 
             $data = [
                 'status' => 404,
@@ -35,16 +36,17 @@ class CarController extends Controller
         }
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'model' => 'required|string|max:50',
             'owner_id' => '',
             'coowner_id' => '',
             'status' => 'string|max:100'
         ]);
 
-        if($validator->fails()){
+        if($validator->fails()) {
 
             $data = [
                 'status' => 422,
@@ -52,8 +54,7 @@ class CarController extends Controller
             ];
 
             return response()->json($data, 422);
-        }
-        else{
+        } else {
 
             $car = Car::create([
                 'model' => $request->model,
@@ -63,38 +64,40 @@ class CarController extends Controller
                 'code' => strval($request->owner_id.substr(trim($request->model), 0, 3).time())
             ]);
 
-            if($car){
+            if($car) {
 
                 $data = [
                     'status' => 200,
                     'message' => 'Car created successfully'
                 ];
-    
+
                 return response()->json($data, 200);
-            }
-            else{
+            } else {
 
                 $data = [
                     'status' => 500,
                     'message' => 'Something went wrong'
                 ];
-    
+
                 return response()->json($data, 500);
             }
         }
     }
 
-    public function show($id){
+    public function show($id)
+    {
         $car = Car::find($id);
-        
-        if($car){
-            if(Auth::user()->cannot('read', $car)){
+        $photos = CarPhoto::where('car_id', $id)->get();
+
+        if($car) {
+            if(Auth::user()->cannot('read', $car)) {
                 return response()->json([
                     'status' => 403,
                     'message' => 'You do not own this car'
                 ]);
-            }
-            else{
+            } else {
+
+                $car->photos = $photos;
                 $data = [
                     'status' => 200,
                     'car' => $car
@@ -102,30 +105,34 @@ class CarController extends Controller
 
                 return response()->json($data, 200);
             }
-        }
-        else{
+        } else {
 
             $data = [
                     'status' => 404,
                     'message' => 'No such car found'
                 ];
-    
-                return response()->json($data, 404);
+
+            return response()->json($data, 404);
         }
     }
 
-    public function read($id){
+    public function read($id)
+    {
         $user = User::find($id);
+
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
-        }else{
-        $cars = Car::where('owner_id', $user->id)->get();
+        } else {
+            $cars = Car::where('owner_id', $user->id)->get();
         }
-        
-        if($cars!=null){
-            foreach ($cars as $car){
-                if(Auth::user()->cannot('read', $car)){
+
+        if($cars!=null) {
+            foreach ($cars as $car) {
+                $photo = CarPhoto::where('car_id', $car->id)->first();
+                $car->photo = $photo;
+
+                if(Auth::user()->cannot('read', $car)) {
                     return response()->json([
                         'status' => 403,
                         'message' => 'You do not own this car'
@@ -133,19 +140,20 @@ class CarController extends Controller
                 }
             }
         }
-    
+
         return response()->json($cars);
     }
-    public function edit(Request $request, $id){
+    public function edit(Request $request, $id)
+    {
 
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'model' => 'required|string|max:50',
             'owner_id' => '',
             'coowner_id' => '',
             'status' => 'string|max:100'
         ]);
 
-        if($validator->fails()){
+        if($validator->fails()) {
 
             $data = [
                 'status' => 422,
@@ -153,66 +161,63 @@ class CarController extends Controller
             ];
 
             return response()->json($data, 422);
-        }
-        else{
+        } else {
 
             $car = Car::find($id);
 
-            if(Auth::user()->cannot('read', $car)){
+            if(Auth::user()->cannot('read', $car)) {
                 return response()->json([
                     'status' => 403,
                     'message' => 'You do not own this car'
                 ]);
-            }
-            else{
-            if($car){
-                
-                $car->update([
-                    'model' => $request->model,
-                    'owner_id' => Auth::user()->id,
-                    'coowner_id' => null,
-                    'status' => $request->status,
-                    'code' => strval($request->owner_id.substr(trim($request->model), 0, 3).time())
-                ]);
+            } else {
+                if($car) {
 
-                $data = [
-                    'status' => 200,
-                    'message' => 'Car updated successfully'
-                ];
-    
-                return response()->json($data, 200);
-            }
-            else{
+                    $car->update([
+                        'model' => $request->model,
+                        'owner_id' => Auth::user()->id,
+                        'coowner_id' => null,
+                        'status' => $request->status,
+                        'code' => strval($request->owner_id.substr(trim($request->model), 0, 3).time())
+                    ]);
 
-                $data = [
-                    'status' => 404,
-                    'message' => 'No such car found'
-                ];
-    
-                return response()->json($data, 404);
+                    $data = [
+                        'status' => 200,
+                        'message' => 'Car updated successfully'
+                    ];
+
+                    return response()->json($data, 200);
+                } else {
+
+                    $data = [
+                        'status' => 404,
+                        'message' => 'No such car found'
+                    ];
+
+                    return response()->json($data, 404);
                 }
             }
         }
     }
-    public function delete($id){
+    public function delete($id)
+    {
         $car = Car::find($id);
 
-        if($car){
-            if(Auth::user()->cannot('read', $car)){
+        if($car) {
+            if(Auth::user()->cannot('read', $car)) {
                 return response()->json([
                     'status' => 403,
                     'message' => 'You do not own this car'
                 ]);
+            } else {
+                $car->delete();
+                $data = [
+                    'status' => 200,
+                    'message' => 'Car deleted successfully'
+                ];
+                return response()->json($data, 200);
             }
-            else{
-            $car->delete();
-            $data = [
-                'status' => 200,
-                'message' => 'Car deleted successfully'
-            ];
-            return response()->json($data, 200);
-        }
-        }else{
+        } else {
             $data = [
                 'status' => 404,
                 'message' => 'No such car found'
@@ -222,9 +227,10 @@ class CarController extends Controller
         }
     }
 
-    public function join(Request $request){
+    public function join(Request $request)
+    {
         $car = Car::where('code', $request->code)->first();
-        if($car){
+        if($car) {
             $car->update([
                 'coowner_id' => Auth::user()->id
             ]);
@@ -234,8 +240,7 @@ class CarController extends Controller
                 'message' => 'Joined car as co-owner successfully'
             ];
             return response()->json($data, 200);
-        }
-        else{
+        } else {
             $data = [
                 'status' => 404,
                 'message' => 'No car with such code found'
