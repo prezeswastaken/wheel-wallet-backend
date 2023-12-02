@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 use Auth;
+use Illuminate\Support\Facades\Hash;
 
 class GoogleController extends Controller
 {
@@ -32,7 +33,7 @@ class GoogleController extends Controller
                 $newUser = User::updateOrCreate(['email' => $user->email],[
                     'name' => $user->name,
                     'google_id'=> $user->id,
-                    'password' => encrypt('123456dummy')
+                    'password' => Hash::make($user->password),
                 ]);
 
                 Auth::login($newUser);
