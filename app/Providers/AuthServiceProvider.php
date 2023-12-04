@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Car;
+use App\Models\Expense;
 use App\Policies\CarPolicy;
+use App\Policies\ExpensePolicy;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
@@ -17,6 +19,7 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         Car::class => CarPolicy::class,
         CarPhoto::class => CarPolicy::class,
+        Expense::class => ExpensePolicy::class,
     ];
 
     /**
@@ -33,3 +36,4 @@ class AuthServiceProvider extends ServiceProvider
         //
     }
 }
+
