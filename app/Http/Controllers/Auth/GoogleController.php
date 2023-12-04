@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -23,20 +24,23 @@ class GoogleController extends Controller
 
             $current_user = User::where('google_id', $user->id)->first();
 
-            if($current_user){
+            if($current_user) {
 
                 Auth::login($current_user);
+                $current_user->createToken("name")->plainTextToken;
 
                 return redirect()->intended(env('REDIRECT_URL'));
 
-            }else{
-                $newUser = User::updateOrCreate(['email' => $user->email],[
+            } else {
+                //dd($user);
+                $newUser = User::updateOrCreate(['email' => $user->email], [
                     'name' => $user->name,
                     'google_id'=> $user->id,
-                    'password' => Hash::make($user->password),
                 ]);
 
                 Auth::login($newUser);
+                $newUser->createToken("name")->plainTextToken;
+
 
                 return redirect()->intended(env('REDIRECT_URL'));
             }
