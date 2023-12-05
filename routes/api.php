@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\CarPhotoController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\OAuthProviderController;
+use App\Models\OAuthProvider;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,3 +52,5 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::get('user/{id}/expenses', [ExpenseController::class, 'userexpenses']);
     Route::get('car/{id}/expenses', [ExpenseController::class, 'carexpenses']);
 });
+
+Route::get('test', [OAuthProviderController::class, 'test']);
