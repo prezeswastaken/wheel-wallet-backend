@@ -23,29 +23,30 @@ class OAuthProviderController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(OAuthProviderEnum $provider)
-{
-    $socialite = Socialite::driver($provider->value)->user();
+    {
+        $socialite = Socialite::driver($provider->value)->user();
 
-    $user = User::firstOrCreate([
-        'email' => $socialite->getEmail(),
-    ], [
-        'name' => $socialite->getName()
-    ]);
+        $user = User::firstOrCreate([
+            'email' => $socialite->getEmail(),
+        ], [
+            'name' => $socialite->getName()
+        ]);
 
-    $user->providers()->updateOrCreate([
-        'provider' => $provider,
-        'provider_id' => $socialite->getId(),
-    ]);
+        $user->providers()->updateOrCreate([
+            'provider' => $provider,
+            'provider_id' => $socialite->getId(),
+        ]);
 
-    Auth::login($user);
+        Auth::login($user);
 
-    return redirect('http://localhost:3000/dashboard');
-    /*return session()->all();*/
-    /*return Auth::user();*/
-}
+        return redirect(env('SOCIALITE_REDIRECT_TO_FRONTEND'));
+        /*return session()->all();*/
+        /*return Auth::user();*/
+    }
 
 
-    public function test(){
+    public function test()
+    {
         return session()->all();
     }
     /**
