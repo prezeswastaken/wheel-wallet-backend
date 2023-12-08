@@ -43,7 +43,7 @@ class CarController extends Controller
             'model' => 'required|string|max:50',
             'owner_id' => '',
             'coowner_id' => '',
-            'status' => 'string|max:100'
+            'status' => 'nullable|string|max:100',
         ]);
 
         if($validator->fails()) {
