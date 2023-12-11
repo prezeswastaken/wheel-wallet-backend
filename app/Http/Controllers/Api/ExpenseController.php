@@ -12,9 +12,10 @@ use Illuminate\Support\Facades\Auth;
 
 class ExpenseController extends Controller
 {
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
-        $validator = Validator::make($request->all(),[
+        $validator = Validator::make($request->all(), [
             'user_id' => '',
             'car_id' => 'required',
             'name' => 'required|string|max:50',
@@ -23,7 +24,7 @@ class ExpenseController extends Controller
             'planned' => 'required|boolean' // 1 - true , 0 - false
         ]);
 
-        if($validator->fails()){
+        if($validator->fails()) {
 
             $data = [
                 'status' => 422,
@@ -31,17 +32,15 @@ class ExpenseController extends Controller
             ];
 
             return response()->json($data, 422);
-        }
-        else{
+        } else {
             $car = Car::find($request->car_id);
 
-            if(Auth::user()->cannot('read', $car)){
+            if(Auth::user()->cannot('read', $car)) {
                 return response()->json([
                     'status' => 403,
                     'message' => 'You do not own this car'
                 ]);
-            }
-            else{
+            } else {
                 $fixed_cost = $request->cost*100;
 
                 $expense = Expense::create([
@@ -53,37 +52,37 @@ class ExpenseController extends Controller
                     'planned' => $request->planned,
                 ]);
 
-                if($expense){
+                if($expense) {
 
                     $data = [
                         'status' => 200,
                         'message' => 'Expense created successfully'
                     ];
-        
+
                     return response()->json($data, 200);
-                }
-                else{
+                } else {
 
                     $data = [
                         'status' => 500,
                         'message' => 'Something went wrong'
                     ];
-        
+
                     return response()->json($data, 500);
                 }
             }
         }
     }
 
-    public function edit(Request $request, $id){
-        $validator = Validator::make($request->all(),[
+    public function edit(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:50',
             'cost' => 'numeric', // 999.99
             'date'=> 'required', // RRRR-MM-DD
             'planned' => 'required|boolean' // 1 - true , 0 - false
         ]);
 
-        if($validator->fails()){
+        if($validator->fails()) {
 
             $data = [
                 'status' => 422,
@@ -91,17 +90,15 @@ class ExpenseController extends Controller
             ];
 
             return response()->json($data, 422);
-        }
-        else{
+        } else {
             $expense = Expense::find($id);
 
-            if(Auth::user()->cannot('read', $expense)){
+            if(Auth::user()->cannot('read', $expense)) {
                 return response()->json([
                     'status' => 403,
                     'message' => 'You do not own this expense'
                 ]);
-            }
-            else{
+            } else {
                 $fixed_cost = $request->cost*100;
 
                 $expense->update([
@@ -111,47 +108,46 @@ class ExpenseController extends Controller
                     'planned' => $request->planned,
                 ]);
 
-                if($expense){
+                if($expense) {
 
                     $data = [
                         'status' => 200,
                         'message' => 'Expense updated successfully'
                     ];
-        
+
                     return response()->json($data, 200);
-                }
-                else{
+                } else {
 
                     $data = [
                         'status' => 500,
                         'message' => 'Something went wrong'
                     ];
-        
+
                     return response()->json($data, 500);
                 }
             }
         }
     }
 
-    public function delete(Request $request, $id){
+    public function delete(Request $request, $id)
+    {
         $expense = Expense::find($id);
 
-        if($expense){
-            if(Auth::user()->cannot('read', $expense)){
+        if($expense) {
+            if(Auth::user()->cannot('read', $expense)) {
                 return response()->json([
                     'status' => 403,
                     'message' => 'You do not own this expense'
                 ]);
+            } else {
+                $expense->delete();
+                $data = [
+                    'status' => 200,
+                    'message' => 'Expense deleted successfully'
+                ];
+                return response()->json($data, 200);
             }
-            else{
-            $expense->delete();
-            $data = [
-                'status' => 200,
-                'message' => 'Expense deleted successfully'
-            ];
-            return response()->json($data, 200);
-        }
-        }else{
+        } else {
             $data = [
                 'status' => 404,
                 'message' => 'No such expense found'
@@ -161,7 +157,8 @@ class ExpenseController extends Controller
 
     }
 
-    public function userexpenses($id){
+    public function userexpenses($id)
+    {
         $user = User::find($id);
 
         if (!$user) {
@@ -171,12 +168,12 @@ class ExpenseController extends Controller
             ];
 
             return response()->json($data, 404);
-        }else{
-        $expenses = Expense::where('user_id', $user->id)->get();
+        } else {
+            $expenses = Expense::where('user_id', $user->id)->get();
         }
-        if($expenses!=null){
-            foreach ($expenses as $expense){
-                if(Auth::user()->cannot('read', $expense)){
+        if($expenses!=null) {
+            foreach ($expenses as $expense) {
+                if(Auth::user()->cannot('read', $expense)) {
                     return response()->json([
                         'status' => 403,
                         'message' => 'You do not own this expense'
@@ -184,8 +181,7 @@ class ExpenseController extends Controller
                 }
             }
             return response()->json($expenses);
-        }
-        else{
+        } else {
             $data = [
                 'status' => 404,
                 'message' => 'No expenses or found'
@@ -195,40 +191,37 @@ class ExpenseController extends Controller
         }
     }
 
-    public function carexpenses($id){
+    public function carexpenses($id)
+    {
         $car = Car::find($id);
-        $expenses = Expense::where('car_id', $car->id)->get();;
-        if($car){
-        if($expenses!=null){
-            if(Auth::user()->cannot('read', $car)){
-                return response()->json([
-                    'status' => 403,
-                    'message' => 'You do not own this car'
-                ]);
-            }
-            else{
+        $expenses = Expense::where('car_id', $car->id)->get();
+        ;
+        if($car) {
+            if($expenses!=null) {
+                if(Auth::user()->cannot('read', $car)) {
+                    return response()->json([
+                        'status' => 403,
+                        'message' => 'You do not own this car'
+                    ]);
+                } else {
+
+                    return response()->json($expenses, 200);
+                }
+            } else {
                 $data = [
-                    'status' => 200,
-                    'expenses' => $expenses
+                    'status' => 404,
+                    'message' => 'No expenses found'
                 ];
 
-                return response()->json($data, 200);
+                return response()->json($data, 404);
             }
-        }else{
+        } else {
             $data = [
                 'status' => 404,
-                'message' => 'No expenses found'
+                'message' => 'No such car found'
             ];
 
             return response()->json($data, 404);
         }
-    }else{
-        $data = [
-            'status' => 404,
-            'message' => 'No such car found'
-        ];
-
-        return response()->json($data, 404);
-    }
     }
 }
