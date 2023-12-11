@@ -30,4 +30,8 @@ class CarPolicy
             return Response::deny('You do not own this car');
         }
     }
+
+    public function index(User $user){
+        return Response::deny('You do not have permission');
+    }
 }
