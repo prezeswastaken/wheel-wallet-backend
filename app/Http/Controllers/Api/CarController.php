@@ -14,25 +14,32 @@ class CarController extends Controller
 {
     public function index()
     {
+        if(Auth::user()->cannot('index' , Car::class)){
+            return response()->json([
+                'status' => 403,
+                'message' => 'You do not have permission'
+            ]);
+        }
+        else{
+            $cars = Car::all();
 
-        $cars = Car::all();
+            if($cars->count() > 0) {
 
-        if($cars->count() > 0) {
+                $data = [
+                    'status' => 200,
+                    'cars' => $cars
+                ];
 
-            $data = [
-                'status' => 200,
-                'cars' => $cars
-            ];
+                return response()->json($data, 200);
+            } else {
 
-            return response()->json($data, 200);
-        } else {
+                $data = [
+                    'status' => 404,
+                    'cars' => 'No records found'
+                ];
 
-            $data = [
-                'status' => 404,
-                'cars' => 'No records found'
-            ];
-
-            return response()->json($data, 404);
+                return response()->json($data, 404);
+            }
         }
     }
 

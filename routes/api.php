@@ -51,6 +51,9 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::delete('expense/{id}/delete', [ExpenseController::class, 'delete']);
     Route::get('user/{id}/expenses', [ExpenseController::class, 'userexpenses']);
     Route::get('car/{id}/expenses', [ExpenseController::class, 'carexpenses']);
+
+    Route::get('users' , [UserController::class, 'index']);
+    Route::delete('user/{id}/delete' , [UserController::class, 'delete']);
 });
 
 Route::get('test', [OAuthProviderController::class, 'test']);
