@@ -14,13 +14,12 @@ class CarController extends Controller
 {
     public function index()
     {
-        if(Auth::user()->cannot('index' , Car::class)){
+        if(Auth::user()->cannot('index', Car::class)) {
             return response()->json([
                 'status' => 403,
                 'message' => 'You do not have permission'
             ]);
-        }
-        else{
+        } else {
             $cars = Car::all();
 
             if($cars->count() > 0) {
@@ -131,7 +130,9 @@ class CarController extends Controller
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         } else {
-            $cars = Car::where('owner_id', $user->id)->get();
+            $cars = Car::where('owner_id', $user->id)
+                ->orWhere('coowner_id', $user->id)
+                ->get();
         }
 
         if($cars!=null) {
