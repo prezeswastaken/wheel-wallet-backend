@@ -44,6 +44,7 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::delete('car/{id}/delete', [CarController::class, 'delete']);
 
     Route::post('car/{id}/upload', [CarPhotoController::class, 'store']);
+    Route::delete('photo/{id}/delete', [CarPhotoController::class, 'delete']);
     Route::get('car/{id}/photos', [CarPhotoController::class, 'show']);
 
     Route::post('expense', [ExpenseController::class, 'store']);

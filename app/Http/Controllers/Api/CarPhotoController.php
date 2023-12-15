@@ -89,4 +89,34 @@ class CarPhotoController extends Controller
             return response()->json($data, 200);
         }
     }
+
+    public function delete($id)
+    {
+        $photo = CarPhoto::find($id);
+        $car = Car::find($photo->car_id);
+
+        if($photo) {
+            if(Auth::user()->cannot('read', $car)) {
+                return response()->json([
+                    'status' => 403,
+                    'message' => 'You do not own this car'
+                ]);
+            } else {
+                $photo->delete();
+                unlink('uploads/car_photos/'.$photo->content);
+                $data = [
+                    'status' => 200,
+                    'message' => 'Photo deleted successfully'
+                ];
+                return response()->json($data);
+            }
+        } else {
+            $data = [
+                'status' => 404,
+                'message' => 'No such photo found'
+            ];
+
+            return response()->json($data);
+        }
+    }
 }
