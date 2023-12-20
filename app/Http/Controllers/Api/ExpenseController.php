@@ -57,6 +57,7 @@ class ExpenseController extends Controller
 
                     Log::create([
                         'car_id' => $car->id,
+                        'username' => Auth::user()->name,
                         'message' => 'Expense '.$request->name.' created'
                     ]);
 
@@ -118,6 +119,7 @@ class ExpenseController extends Controller
 
                     Log::create([
                         'car_id' => $car->id,
+                        'username' => Auth::user()->name,
                         'message' => 'Expense '.$request->name.' updated'
                     ]);
 
@@ -161,6 +163,7 @@ class ExpenseController extends Controller
 
                 Log::create([
                     'car_id' => $car->id,
+                    'username' => Auth::user()->name,
                     'message' => 'Expense '.$name.' deleted'
                 ]);
 

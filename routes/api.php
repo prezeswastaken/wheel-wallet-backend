@@ -56,6 +56,7 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::get('users' , [UserController::class, 'index']);
     Route::delete('user/{id}/delete' , [UserController::class, 'delete']);
 
-    Route::get('car/{id}/logs' , [LogController::class, 'read']);
+    Route::get('car/{id}/logs' , [LogController::class, 'readcar']);
+    Route::get('user/{id}/logs' , [LogController::class, 'readuser']);
 });
 

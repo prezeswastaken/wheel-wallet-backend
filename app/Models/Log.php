@@ -12,5 +12,6 @@ class Log extends Model
     protected $fillable = [
         'car_id',
         'message',
+        'username',
     ];
 }

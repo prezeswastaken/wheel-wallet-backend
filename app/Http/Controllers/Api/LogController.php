@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class LogController extends Controller
 {
 
-    public function read($id)
+    public function readcar($id)
     {
         $car = Car::find($id);
 
@@ -32,4 +32,24 @@ class LogController extends Controller
         }
     }
 
+    public function readuser($id)
+    {
+        $cars = Car::where('owner_id', $id)->orWhere('coowner_id', $id)->get();
+        $logs = collect();
+
+        foreach($cars as $car){
+            if(Auth::user()->cannot('read', $car)) {
+                return response()->json([
+                    'status' => 403,
+                    'message' => 'You do not own this car'
+                ]);
+            } 
+            else {
+                $this_car_logs = Log::where('car_id', $car->id)->get();
+                $logs = $logs->merge($this_car_logs);
+            }
+        }
+
+        return response()->json($logs);
+    }
 }

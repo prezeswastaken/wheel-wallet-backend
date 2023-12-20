@@ -81,7 +81,8 @@ class CarController extends Controller
                 
                 Log::create([
                     'car_id' => $car->id,
-                    'message' => 'Car created'
+                    'username' => Auth::user()->name,
+                    'message' => 'Car '.$car->model.' created'
                 ]);
 
                 return response()->json($data, 200);
@@ -198,6 +199,7 @@ class CarController extends Controller
 
                     Log::create([
                         'car_id' => $car->id,
+                        'username' => Auth::user()->name,
                         'message' => 'Car edited'
                     ]);
 
@@ -257,6 +259,7 @@ class CarController extends Controller
 
             Log::create([
                 'car_id' => $car->id,
+                'username' => Auth::user()->name,
                 'message' => Auth::user()->name.' joined as co-owner'
             ]);
 
