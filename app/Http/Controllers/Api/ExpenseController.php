@@ -189,6 +189,9 @@ class ExpenseController extends Controller
             return response()->json($data, 404);
         } else {
             $expenses = Expense::where('user_id', $user->id)->get();
+            foreach ($expenses as $expense) {
+                $expense->car_model = Car::find($expense->car_id)->model;
+            }
         }
         if($expenses!=null) {
             foreach ($expenses as $expense) {
