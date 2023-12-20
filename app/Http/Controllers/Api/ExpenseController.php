@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Car;
 use App\Models\User;
+use App\Models\Log;
 use App\Models\Expense;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -53,6 +54,11 @@ class ExpenseController extends Controller
                 ]);
 
                 if($expense) {
+
+                    Log::create([
+                        'car_id' => $car->id,
+                        'message' => 'Expense '.$request->name.' created'
+                    ]);
 
                     $data = [
                         'status' => 200,
@@ -110,6 +116,11 @@ class ExpenseController extends Controller
 
                 if($expense) {
 
+                    Log::create([
+                        'car_id' => $car->id,
+                        'message' => 'Expense '.$request->name.' updated'
+                    ]);
+
                     $data = [
                         'status' => 200,
                         'message' => 'Expense updated successfully'
@@ -134,6 +145,8 @@ class ExpenseController extends Controller
         $expense = Expense::find($id);
 
         if($expense) {
+            $name = $expense->name;
+
             if(Auth::user()->cannot('read', $expense)) {
                 return response()->json([
                     'status' => 403,
@@ -145,6 +158,12 @@ class ExpenseController extends Controller
                     'status' => 200,
                     'message' => 'Expense deleted successfully'
                 ];
+
+                Log::create([
+                    'car_id' => $car->id,
+                    'message' => 'Expense '.$name.' deleted'
+                ]);
+
                 return response()->json($data, 200);
             }
         } else {

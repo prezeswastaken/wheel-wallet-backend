@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\GoogleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,8 +18,3 @@ Route::get('/', function () {
 });
 
 require __DIR__.'/auth.php';
-
-Route::controller(GoogleController::class)->group(function(){
-    Route::get('social/google', 'redirect')->name('auth.google');
-    Route::get('social/google/callback', 'googleCallback');
-});

@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\CarController;
 use App\Http\Controllers\Api\CarPhotoController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\LogController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\OAuthProviderController;
 use App\Models\OAuthProvider;
@@ -55,6 +55,7 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
 
     Route::get('users' , [UserController::class, 'index']);
     Route::delete('user/{id}/delete' , [UserController::class, 'delete']);
+
+    Route::get('car/{id}/logs' , [LogController::class, 'read']);
 });
 
-Route::get('test', [OAuthProviderController::class, 'test']);

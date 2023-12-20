@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Car;
 use App\Models\User;
+use App\Models\Log;
 use App\Http\Controllers\Controller;
 use App\Models\CarPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Api\LogController;
 
 class CarController extends Controller
 {
@@ -67,7 +69,7 @@ class CarController extends Controller
                 'owner_id' => Auth::user()->id,
                 'coowner_id' => null,
                 'status' => $request->status,
-                'code' => strval($request->owner_id.substr(trim($request->model), 0, 3).time())
+                'code' => strval(Auth::user()->id.substr(trim($request->model), 0, 3).time())
             ]);
 
             if($car) {
@@ -76,6 +78,11 @@ class CarController extends Controller
                     'status' => 200,
                     'message' => 'Car created successfully'
                 ];
+                
+                Log::create([
+                    'car_id' => $car->id,
+                    'message' => 'Car created'
+                ]);
 
                 return response()->json($data, 200);
             } else {
@@ -189,6 +196,11 @@ class CarController extends Controller
                         'code' => strval($request->owner_id.substr(trim($request->model), 0, 3).time())
                     ]);
 
+                    Log::create([
+                        'car_id' => $car->id,
+                        'message' => 'Car edited'
+                    ]);
+
                     $data = [
                         'status' => 200,
                         'message' => 'Car updated successfully'
@@ -241,6 +253,11 @@ class CarController extends Controller
         if($car) {
             $car->update([
                 'coowner_id' => Auth::user()->id
+            ]);
+
+            Log::create([
+                'car_id' => $car->id,
+                'message' => Auth::user()->name.' joined as co-owner'
             ]);
 
             $data = [
