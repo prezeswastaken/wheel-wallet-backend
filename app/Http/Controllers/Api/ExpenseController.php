@@ -117,6 +117,8 @@ class ExpenseController extends Controller
 
                 if($expense) {
 
+                    //dd($expense);
+                    $car = Car::where('id', $expense->car_id)->first();
                     Log::create([
                         'car_id' => $car->id,
                         'username' => Auth::user()->name,
