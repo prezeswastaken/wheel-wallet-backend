@@ -10,20 +10,19 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
+    public function testUserCanAuthenticate(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->post('/login', [
+        $this->post('/login', [
             'email' => $user->email,
             'password' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertNoContent();
+        $this->assertAuthenticatedAs($user);
     }
 
-    public function test_users_can_not_authenticate_with_invalid_password(): void
+    public function testUserCanNotAuthenticateWrongPassword(): void
     {
         $user = User::factory()->create();
 
@@ -35,13 +34,24 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_users_can_logout(): void
+    public function testUserCanNotAuthenticateWrongEmail(): void
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->post('/logout');
+        $this->post('/login', [
+            'email' => 'wrong-email',
+            'password' => 'password',
+        ]);
 
         $this->assertGuest();
-        $response->assertNoContent();
+    }
+
+    public function testUserCanLogout(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post('/logout');
+
+        $this->assertGuest();
     }
 }
