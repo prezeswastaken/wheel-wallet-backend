@@ -31,6 +31,14 @@ return new class () extends Migration {
                 'is_admin' => true
             )
         );
+        DB::table('users')->insert(
+            array(
+                'name' => 'user',
+                'email' => 'user@example.com',
+                'password' => Hash::make("test123"),
+                'is_admin' => false
+            )
+        );
     }
 
     /**

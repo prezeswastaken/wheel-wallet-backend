@@ -10,6 +10,35 @@ use Illuminate\Http\Request;
 
 class LogController extends Controller
 {
+    public function index()
+    {
+        if(Auth::user()->cannot('index', Log::class)) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'You do not have permission'
+            ]);
+        } else {
+            $logs = Log::all();
+
+            if($logs->count() > 0) {
+
+                $data = [
+                    'status' => 200,
+                    'cars' => $logs
+                ];
+
+                return response()->json($data, 200);
+            } else {
+
+                $data = [
+                    'status' => 404,
+                    'logs' => 'No records found'
+                ];
+
+                return response()->json($data, 404);
+            }
+        }
+    }
 
     public function readcar($id)
     {
