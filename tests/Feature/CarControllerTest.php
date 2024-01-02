@@ -1,0 +1,226 @@
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Str;
+use App\Models\User;
+use App\Models\Car;
+use Tests\TestCase;
+
+class CarControllerTest extends TestCase
+{
+    use RefreshDatabase;
+    
+    public function testAdminCanSeeAllCars(): void
+    {
+        $user = User::factory()->create();
+        $admin = User::factory()->create(['is_admin' => true]);
+        $car = Car::factory()->create(['owner_id' => $user->id]);
+
+        $response = $this->actingAs($admin)->get("/api/car");
+
+        $response->assertJson([
+            'status' => 200,
+            'cars' => [
+                [
+                    'id' => $car->id,
+                    'model' => $car->model,
+                    'owner_id' => $car->owner_id,
+                    'coowner_id' => $car->coowner_id,
+                    'status' => $car->status,
+                    'code' => $car->code,
+                    'created_at' => $car->created_at->toISOString(),
+                    'updated_at' => $car->updated_at->toISOString(),
+                ],
+            ],
+        ]);
+    }
+
+    public function testUserCanNotSeeAllCars(): void
+    {
+        $user = User::factory()->create();
+        $car = Car::factory()->create();
+
+        $response = $this->actingAs($user)->get("/api/car");
+
+        $response->assertJson(['status' => 403]);
+    }
+    
+    public function testCarCanBeCreated(): void
+    {
+        $user = User::factory()->create();
+        $car = [
+            'model' => 'Opel Astra',
+            'status' => 'Crashed',
+        ];
+
+        $this->actingAs($user)->post('/api/car', $car);
+
+        $this->assertDatabaseHas('cars', $car);
+    }
+
+    public function testCarCanNotBeCreatedInvalidData(): void
+    {
+        $user = User::factory()->create();
+        $car = [
+            'model' => Str::random(51),
+            'status' => 'Crashed',
+        ];
+
+        $response = $this->actingAs($user)->post('/api/car', $car);
+
+        $response->assertInvalid('model');
+    }
+
+    public function testCarCanNotBeCreatedUserNotAuthenticated(): void
+    {
+        $car = [
+            'model' => 'Opel Astra',
+            'status' => 'Crashed',
+        ];
+
+        $this->post('/api/car', $car);
+
+        $this->assertDatabaseMissing('cars', $car);
+    }
+
+    public function testUserCanSeeHisCars(): void
+    {
+        $user = User::factory()->create();
+        $car = Car::factory()->create(['owner_id' => $user->id]);
+
+        $response = $this->actingAs($user)->get("/api/user/{$user->id}/cars");
+
+        $response->assertJson([$car->toArray()]);
+    }
+
+    public function testUserCanSeeCarsOfOtherUserAsCoowner(): void
+    {
+        $user = User::factory()->create();
+        $user2 = User::factory()->create();
+        $car = Car::factory()->create([
+            'owner_id' => $user->id,
+            'coowner_id' => $user2->id,
+        ]);
+
+        $response = $this->actingAs($user2)->get("/api/user/{$user2->id}/cars");
+
+        $response->assertJson([$car->toArray()]);
+    }
+
+    public function testUserCanNotSeeOtherUsersCars(): void
+    {
+        $user = User::factory()->create();
+        $user2 = User::factory()->create();
+        $car = Car::factory()->create(['owner_id' => $user->id]);
+
+        $response = $this->actingAs($user2)->get("/api/user/{$user->id}/cars");
+
+        $response->assertJson(['status' => 403]);
+    }
+
+    public function testUserCanEditHisCars(): void
+    {
+        $user = User::factory()->create();
+        $car = Car::factory()->create([
+            'model' => 'Opel Astra',
+            'status' => 'Factory new',
+            'owner_id' => $user->id,
+        ]);
+        $data = [
+            'model' => 'Opel',
+            'status' => 'temporarily out of order',
+        ];
+
+        $this->actingAs($user)->put("/api/car/{$car->id}/edit", $data);
+
+        $this->assertDatabaseHas('cars', $data);
+    }
+
+    public function testUserCanNotEditOtherUsersCars(): void
+    {
+        $user = User::factory()->create();
+        $user2 = User::factory()->create();
+        $car = Car::factory()->create([
+            'model' => 'Opel Astra',
+            'status' => 'Factory new',
+            'owner_id' => $user->id,
+        ]);
+        $data = [
+            'model' => 'Opel',
+            'status' => 'temporarily out of order',
+        ];
+
+        $response = $this->actingAs($user2)->put("/api/car/{$car->id}/edit", $data);
+
+        $response->assertJson(['status' => 403]);
+    }
+
+    public function testUserCanNotEditHisCarsInvalidData(): void
+    {
+        $user = User::factory()->create();
+        $car = Car::factory()->create([
+            'model' => 'Opel Astra',
+            'status' => 'Factory new',
+            'owner_id' => $user->id,
+        ]);
+        $data = [
+            'model' => Str::random(51),
+            'status' => 'temporarily out of order',
+        ];
+
+        $response = $this->actingAs($user)->put("/api/car/{$car->id}/edit", $data);
+
+        $response->assertInvalid('model');
+    }
+
+    public function testCarCanBeDeleted(): void
+    {
+        $user = User::factory()->create();
+        $car = Car::factory()->create(['owner_id' => $user->id]);
+
+        $this->actingAs($user)->delete("/api/car/{$car->id}/delete");
+
+        $this->assertDatabaseMissing('cars', $car->toArray());
+    }
+
+    public function testUserCanNotDeleteCarsOfOtherUsers(): void
+    {
+        $user = User::factory()->create();
+        $user2 = User::factory()->create();
+        $car = Car::factory()->create(['owner_id' => $user->id]);
+
+        $response = $this->actingAs($user2)->delete("/api/car/{$car->id}/delete");
+
+        $response->assertJson(['status' => 403]);
+    }
+
+    public function testUserCanJoinAsCoowner(): void
+    {
+        $user = User::factory()->create();
+        $user2 = User::factory()->create();
+        $car = Car::factory()->create(['owner_id' => $user->id]);
+
+        $data = ['code' => $car->code];
+
+        $this->actingAs($user2)->post("/api/car/join", $data)->assertStatus(200);
+        $car->refresh();
+
+        $response = $this->actingAs($user2)->get("/api/user/{$user2->id}/cars");
+        
+        $response->assertJson([$car->toArray()]);
+    }
+
+    public function testUserCanNotJoinAsCoownerWrongCode(): void
+    {
+        $user = User::factory()->create();
+        $user2 = User::factory()->create();
+        $car = Car::factory()->create(['owner_id' => $user->id]);
+
+        $data = ['code' => '6githabsat312v'];
+
+        $this->actingAs($user2)->post("/api/car/join", $data)->assertStatus(404);
+    }
+}
