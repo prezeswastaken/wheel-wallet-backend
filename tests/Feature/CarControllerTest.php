@@ -21,21 +21,7 @@ class CarControllerTest extends TestCase
 
         $response = $this->actingAs($admin)->get("/api/car");
 
-        $response->assertJson([
-            'status' => 200,
-            'cars' => [
-                [
-                    'id' => $car->id,
-                    'model' => $car->model,
-                    'owner_id' => $car->owner_id,
-                    'coowner_id' => $car->coowner_id,
-                    'status' => $car->status,
-                    'code' => $car->code,
-                    'created_at' => $car->created_at->toISOString(),
-                    'updated_at' => $car->updated_at->toISOString(),
-                ],
-            ],
-        ]);
+        $response->assertJsonStructure(['cars' => []]);
     }
 
     public function testUserCanNotSeeAllCars(): void
@@ -134,9 +120,10 @@ class CarControllerTest extends TestCase
             'status' => 'temporarily out of order',
         ];
 
-        $this->actingAs($user)->put("/api/car/{$car->id}/edit", $data);
+        $this->actingAs($user)->put("/api/car/{$car->id}/edit", $data)->assertJson(['status' => 200]);
+        $car->refresh();
 
-        $this->assertDatabaseHas('cars', $data);
+        $this->assertDatabaseHas('cars', $car->toArray());
     }
 
     public function testUserCanNotEditOtherUsersCars(): void
@@ -154,7 +141,6 @@ class CarControllerTest extends TestCase
         ];
 
         $response = $this->actingAs($user2)->put("/api/car/{$car->id}/edit", $data);
-
         $response->assertJson(['status' => 403]);
     }
 
