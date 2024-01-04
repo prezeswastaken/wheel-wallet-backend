@@ -20,6 +20,11 @@ class CarsMigrationTest extends TestCase
 
         $this->assertTrue(Schema::hasColumns('cars', [
             'id',
+            'model',
+            'owner_id',
+            'coowner_id',
+            'status',
+            'code',
             'created_at',
             'updated_at',
         ]));
