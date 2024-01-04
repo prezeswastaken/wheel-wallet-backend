@@ -25,10 +25,13 @@ class DatabaseMigrationTest extends TestCase
             'email',
             'password',
             'email_verified_at',
-            'password',
+            'profile_picture',
+            'is_admin',
             'remember_token',
             'created_at',
             'updated_at',
+            'google_id',
+            
         ]));
     }
 

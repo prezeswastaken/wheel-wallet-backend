@@ -11,7 +11,7 @@ class O_auth_providerTest extends TestCase
     use RefreshDatabase;
 
    
-    public function test_cars_table_has_expected_columns()
+    public function test_o_auth_providers_table_has_expected_columns()
     {
        
         $this->artisan('migrate');

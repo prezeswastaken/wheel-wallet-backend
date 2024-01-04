@@ -11,7 +11,7 @@ class Failed_jobsTest extends TestCase
     use RefreshDatabase;
 
    
-    public function test_cars_table_has_expected_columns()
+    public function test_failed_jobs_table_has_expected_columns()
     {
        
         $this->artisan('migrate');

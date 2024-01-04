@@ -11,7 +11,7 @@ class MigrationsTest extends TestCase
     use RefreshDatabase;
 
    
-    public function test_cars_table_has_expected_columns()
+    public function test_migrations_table_has_expected_columns()
     {
        
         $this->artisan('migrate');
