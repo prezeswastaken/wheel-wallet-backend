@@ -21,7 +21,18 @@ class CarControllerTest extends TestCase
 
         $response = $this->actingAs($admin)->get("/api/car");
 
-        $response->assertJsonStructure(['cars' => []]);
+        $response->assertJsonStructure([
+            'cars' => [
+                [
+                    'id',
+                    'model',
+                    'owner_id',
+                    'coowner_id',
+                    'status',
+                    'code',
+                ],
+            ],
+        ]);
     }
 
     public function testUserCanNotSeeAllCars(): void

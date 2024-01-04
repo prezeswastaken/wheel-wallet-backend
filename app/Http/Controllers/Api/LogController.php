@@ -24,7 +24,7 @@ class LogController extends Controller
 
                 $data = [
                     'status' => 200,
-                    'cars' => $logs
+                    'logs' => $logs
                 ];
 
                 return response()->json($data, 200);

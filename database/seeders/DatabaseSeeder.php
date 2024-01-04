@@ -16,6 +16,5 @@ class DatabaseSeeder extends Seeder
         \App\Models\Car::factory()->create();
         \App\Models\Log::factory()->create();
         \App\Models\Expense::factory()->create();
-        \App\Models\CarPhoto::factory()->create();
     }
 }

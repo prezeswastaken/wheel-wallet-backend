@@ -18,7 +18,16 @@ class UserControllerTest extends TestCase
 
         $response = $this->actingAs($admin)->get("/api/users");
 
-        $response->assertJsonStructure(['users' => []]);
+        $response->assertJsonStructure([
+            'users' => [
+                [
+                    'id',
+                    'name',
+                    'email',
+                    'is_admin',
+                ],
+            ],
+        ]);
     }
 
     public function testUserCanNotSeeAllUsers(): void
