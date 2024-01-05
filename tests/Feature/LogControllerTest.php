@@ -82,4 +82,27 @@ class LogControllerTest extends TestCase
 
         $response->assertJson(['status' => 403]);
     }
+
+    public function testUserCanSeeHisLogs(): void
+    {
+        $user = User::factory()->create();
+        $car = Car::factory()->create(['owner_id' => $user->id]);
+        $log = Log::factory()->create(['car_id' => $car->id]);
+
+        $response = $this->actingAs($user)->get("/api/user/{$user->id}/logs");
+
+        $response->assertJson([$log->toArray()]);
+    }
+
+    public function testUserCanNotSeeLogsAboutOtherUsers(): void
+    {
+        $user = User::factory()->create();
+        $user2 = User::factory()->create();
+        $car = Car::factory()->create(['owner_id' => $user->id]);
+        $log = Log::factory()->create(['car_id' => $car->id]);
+
+        $response = $this->actingAs($user2)->get("/api/user/{$user->id}/logs");
+
+        $response->assertJson(['status' => 403]);
+    }
 }
