@@ -17,7 +17,6 @@ return new class () extends Migration {
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
-            $table->bigInteger('budget')->default(0);
             $table->binary('profile_picture')->nullable();
             $table->boolean('is_admin')->default('false');
             $table->rememberToken();
@@ -30,6 +29,14 @@ return new class () extends Migration {
                 'email' => 'admin@example.com',
                 'password' => Hash::make("admin123"),
                 'is_admin' => true
+            )
+        );
+        DB::table('users')->insert(
+            array(
+                'name' => 'user',
+                'email' => 'user@example.com',
+                'password' => Hash::make("test123"),
+                'is_admin' => false
             )
         );
     }

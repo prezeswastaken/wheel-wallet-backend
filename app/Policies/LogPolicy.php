@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Car;
+use App\Models\Log;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class CarPolicy
+class LogPolicy
 {
     /**
      * Create a new policy instance.
@@ -21,16 +21,6 @@ class CarPolicy
             return true;
         }
     }
-
-    public function read(User $user, Car $car){
-        if($user->id === $car->owner_id || $user->id === $car->coowner_id){
-            return Response::allow();
-        }
-        else{
-            return Response::deny('You do not own this car');
-        }
-    }
-
     public function index(User $user){
         return Response::deny('You do not have permission');
     }

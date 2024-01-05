@@ -6,8 +6,10 @@ use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\CarController;
 use App\Http\Controllers\Api\CarPhotoController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\LogController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\OAuthProviderController;
+use App\Models\OAuthProvider;
 
 /*
 |--------------------------------------------------------------------------
@@ -42,6 +44,7 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::delete('car/{id}/delete', [CarController::class, 'delete']);
 
     Route::post('car/{id}/upload', [CarPhotoController::class, 'store']);
+    Route::delete('photo/{id}/delete', [CarPhotoController::class, 'delete']);
     Route::get('car/{id}/photos', [CarPhotoController::class, 'show']);
 
     Route::post('expense', [ExpenseController::class, 'store']);
@@ -49,4 +52,13 @@ Route::group(['middleware' => ['auth:sanctum']], function (){
     Route::delete('expense/{id}/delete', [ExpenseController::class, 'delete']);
     Route::get('user/{id}/expenses', [ExpenseController::class, 'userexpenses']);
     Route::get('car/{id}/expenses', [ExpenseController::class, 'carexpenses']);
+
+    Route::get('users' , [UserController::class, 'index']);
+    Route::delete('user/{id}/delete' , [UserController::class, 'delete']);
+
+    Route::get('logs' , [LogController::class, 'index']);
+    Route::get('car/{id}/logs' , [LogController::class, 'readcar']);
+    Route::get('user/{id}/logs' , [LogController::class, 'readuser']);
+
 });
+
