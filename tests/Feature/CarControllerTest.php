@@ -53,9 +53,16 @@ class CarControllerTest extends TestCase
             'status' => 'Crashed',
         ];
 
+        $log = [
+            'username' => $user->name,
+            'message' => "Car Opel Astra created",
+        ];
+
         $this->actingAs($user)->post('/api/car', $car);
 
         $this->assertDatabaseHas('cars', $car);
+
+        $this->assertDatabaseHas('logs', $log);
     }
 
     public function testCarCanNotBeCreatedInvalidData(): void
@@ -131,10 +138,18 @@ class CarControllerTest extends TestCase
             'status' => 'temporarily out of order',
         ];
 
+        $log = [
+            'car_id' => $car->id,
+            'username' => $user->name,
+            'message' => "Car edited",
+        ];
+
         $this->actingAs($user)->put("/api/car/{$car->id}/edit", $data)->assertJson(['status' => 200]);
         $car->refresh();
 
         $this->assertDatabaseHas('cars', $car->toArray());
+
+        $this->assertDatabaseHas('logs', $log);
     }
 
     public function testUserCanNotEditOtherUsersCars(): void
@@ -202,12 +217,20 @@ class CarControllerTest extends TestCase
 
         $data = ['code' => $car->code];
 
+        $log = [
+            'car_id' => $car->id,
+            'username' => $user2->name,
+            'message' => "{$user2->name} joined as co-owner",
+        ];
+
         $this->actingAs($user2)->post("/api/car/join", $data)->assertStatus(200);
         $car->refresh();
 
         $response = $this->actingAs($user2)->get("/api/user/{$user2->id}/cars");
         
         $response->assertJson([$car->toArray()]);
+
+        $this->assertDatabaseHas('logs', $log);
     }
 
     public function testUserCanNotJoinAsCoownerWrongCode(): void

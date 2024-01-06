@@ -26,6 +26,12 @@ class ExpenseControllerTest extends TestCase
             'planned' => false,
         ];
 
+        $log = [
+            'car_id' => $car->id,
+            'username' => $user->name,
+            'message' => "Expense Refueling created",
+        ];
+
         $this->actingAs($user)->post('/api/expense', $expense);
 
         $this->assertDatabaseHas('expenses', [
@@ -35,6 +41,8 @@ class ExpenseControllerTest extends TestCase
             'date' => '2024-01-05',
             'planned' => false,
         ]);
+
+        $this->assertDatabaseHas('logs', $log);
     }
 
     public function testUserCanCreateExpenseForOtherUsersCarsAsCoowner(): void
@@ -54,6 +62,12 @@ class ExpenseControllerTest extends TestCase
             'planned' => false,
         ];
 
+        $log = [
+            'car_id' => $car->id,
+            'username' => $user2->name,
+            'message' => "Expense Refueling created",
+        ];
+
         $this->actingAs($user2)->post('/api/expense', $expense);
 
         $this->assertDatabaseHas('expenses', [
@@ -63,6 +77,8 @@ class ExpenseControllerTest extends TestCase
             'date' => '2024-01-05',
             'planned' => false,
         ]);
+
+        $this->assertDatabaseHas('logs', $log);
     }
 
     public function testExpenseCanNotBeCreatedInvalidData(): void
@@ -119,10 +135,18 @@ class ExpenseControllerTest extends TestCase
             'planned' => $expense->planned,
         ];
 
+        $log = [
+            'car_id' => $car->id,
+            'username' => $user->name,
+            'message' => "Expense Wheel change updated",
+        ];
+
         $this->actingAs($user)->put("/api/expense/{$expense->id}/edit", $data)->assertJson(['status' => 200]);
         $expense->refresh();
 
         $this->assertDatabaseHas('expenses', $expense->toArray());
+
+        $this->assertDatabaseHas('logs', $log);
     }
 
     public function testUserCanNotEditOtherUsersExpenses(): void
