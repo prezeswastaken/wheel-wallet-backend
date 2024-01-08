@@ -58,7 +58,7 @@ class ExpenseController extends Controller
                     Log::create([
                         'car_id' => $car->id,
                         'username' => Auth::user()->name,
-                        'message' => 'Expense '.$request->name.' created'
+                        'message' => 'Expense '.$request->name.' for car '.$car->model.' created'
                     ]);
 
                     $data = [
@@ -120,7 +120,7 @@ class ExpenseController extends Controller
                     Log::create([
                         'car_id' => $car->id,
                         'username' => Auth::user()->name,
-                        'message' => 'Expense '.$request->name.' updated'
+                        'message' => 'Expense '.$request->name.' for car '.$car->model.' updated'
                     ]);
 
                     $data = [
@@ -164,7 +164,7 @@ class ExpenseController extends Controller
                 Log::create([
                     'car_id' => $car->id,
                     'username' => Auth::user()->name,
-                    'message' => 'Expense '.$name.' deleted'
+                    'message' => 'Expense '.$name.' for car '.$car->model.' deleted'
                 ]);
 
                 return response()->json($data, 200);

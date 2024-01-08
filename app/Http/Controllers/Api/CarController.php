@@ -200,7 +200,7 @@ class CarController extends Controller
                     Log::create([
                         'car_id' => $car->id,
                         'username' => Auth::user()->name,
-                        'message' => 'Car edited'
+                        'message' => 'Car '.$car->model.' edited'
                     ]);
 
                     $data = [
@@ -235,7 +235,7 @@ class CarController extends Controller
                 $car->delete();
                 $data = [
                     'status' => 200,
-                    'message' => 'Car deleted successfully'
+                    'message' => 'Car '.$car->model.' deleted successfully'
                 ];
                 return response()->json($data, 200);
             }
@@ -260,7 +260,7 @@ class CarController extends Controller
             Log::create([
                 'car_id' => $car->id,
                 'username' => Auth::user()->name,
-                'message' => Auth::user()->name.' joined as co-owner'
+                'message' => Auth::user()->name.' joined '.$car->model.' as co-owner'
             ]);
 
             $data = [
