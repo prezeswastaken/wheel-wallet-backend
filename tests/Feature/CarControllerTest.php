@@ -138,14 +138,14 @@ class CarControllerTest extends TestCase
             'status' => 'temporarily out of order',
         ];
 
+        $this->actingAs($user)->put("/api/car/{$car->id}/edit", $data)->assertJson(['status' => 200]);
+        $car->refresh();
+
         $log = [
             'car_id' => $car->id,
             'username' => $user->name,
-            'message' => "Car edited",
+            'message' => "Car $car->model edited",
         ];
-
-        $this->actingAs($user)->put("/api/car/{$car->id}/edit", $data)->assertJson(['status' => 200]);
-        $car->refresh();
 
         $this->assertDatabaseHas('cars', $car->toArray());
 
@@ -220,7 +220,7 @@ class CarControllerTest extends TestCase
         $log = [
             'car_id' => $car->id,
             'username' => $user2->name,
-            'message' => "{$user2->name} joined as co-owner",
+            'message' => "{$user2->name} joined $car->model as co-owner",
         ];
 
         $this->actingAs($user2)->post("/api/car/join", $data)->assertStatus(200);
