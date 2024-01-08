@@ -78,7 +78,7 @@ class CarController extends Controller
                     'status' => 200,
                     'message' => 'Car created successfully'
                 ];
-                
+
                 Log::create([
                     'car_id' => $car->id,
                     'username' => Auth::user()->name,
@@ -191,10 +191,7 @@ class CarController extends Controller
 
                     $car->update([
                         'model' => $request->model,
-                        'owner_id' => Auth::user()->id,
-                        'coowner_id' => null,
                         'status' => $request->status,
-                        'code' => strval($request->owner_id.substr(trim($request->model), 0, 3).time())
                     ]);
 
                     Log::create([
